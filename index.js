@@ -1,10 +1,11 @@
-const express = require("express")
+const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
-const { initializeDatabase } = require("./db/db.connect")
-const Book = require("./models/book.models")
+const { initializeDatabase } = require("./db/db.connect");
+const User = require("./models/user.models");
+const Event = require("./models/event.models");
 
 const corsOptions = {
     origin: "*",
@@ -17,222 +18,98 @@ app.use(express.json());
 
 initializeDatabase();
 
-async function createBook(newBook) {
+const newUser = {
+    name: "Michael Brown",
+    email: "michael.brown@gmail.com",
+    designation: "SEO Specialist",
+    profilePhotoUrl: "https://i.pravatar.cc/300"
+}
+
+const newEvent = {
+    title: "Marketing Seminar",
+    startTime: "Tue Aug 15 2023 at 10:00:00 AM",
+    endTime: "Tue Aug 15 2023 at 12:00:00 PM",
+    type: "Offline",
+    hostedBy: "Marketing Experts",
+    hostedAt: "Marketing City",    
+    price: 3000,
+    details: "Join us for an engaging Marketing Workshop on Tuesday, August 15, 2023, from 10:00 AM to 12:00 PM. This session is designed for individuals aged 18 and above who are eager to enhance their marketing skills and strategies. Whether you're a business owner, entrepreneur, or aspiring marketer, this workshop will provide valuable insights to boost your marketing efforts.Limited seats available! Reserve your spot today and take your marketing skills to the next level.",
+    speakers: ["67809b4714d8a177c3247b2a", "67809b7acd3a6e1b6bb45d3e"],
+    tags: ["marketing", "digital"],
+    dressCode: "Smart casual",
+    ageRestriction: "18 and above",
+    posterImageUrl: "https://img.freepik.com/free-photo/senior-woman-artist-teaching-group-people-how-draw-sitting-chair-classroom-smiling-camera-positive-atmosphere-drawing-workshop-art-education-sketching-classes-adults_482257-64491.jpg"
+}
+
+async function createEvent(newEvent) {
     try{
-        const book = new Book(newBook);
-        const saveBook = await book.save();
-        return saveBook;
+        const event = new Event(newEvent);
+        const saveEvent = await event.save();        
     }
     catch(error){
         console.log(error);
     }
 }
+//createEvent(newEvent);
 
-app.post("/books", async (req, res) => {
+async function createUser(newUser) {
     try{
-        const savedBook = await createBook(req.body)
-        res.status(201).json({message: "Book added successfully.", book: savedBook})
+        const user = new User(newUser);
+        const saveUser = await user.save();        
     }
     catch(error){
-        res.status(500).json({error: "Failed to add the book."})
+        console.log(error);
     }
-})
+}
+//createUser(newUser);
 
-async function readAllBooks() {
+async function readAllEvents() {
     try{
-        const books = await Book.find()
-        return books;
+        const events = await Event.find()
+        return events;
     }
     catch(error){
         throw error;
     }
 }
 
-app.get("/books", async (req, res) => {
+app.get("/events", async (req, res) => {
     try {
-        const books = await readAllBooks();
-        if(books.length > 0)
+        const events = await readAllEvents();
+        if(events.length > 0)
         {
-            res.json(books);
+            res.json(events);
         }
         else{
-            res.status(404).json({error: "No books found."});
+            res.status(404).json({error: "No events found."});
         }
     } catch (error) {
-        res.status(500).json({error: "Failed to fetch books."});
+        res.status(500).json({error: "Failed to fetch events."});
     }
 })
 
-async function readBookByTitle(bookTitle){
+async function readEventByTitle(eventTitle){
     try{
-        const book = await Book.findOne({title: bookTitle});
-        return book;
+        const event = await Event.findOne({title: eventTitle}).populate("speakers");
+        return event;
     }
     catch(error){
         throw error
     }
 }
 
-app.get("/books/:title", async (req, res) => {
+app.get("/events/:title", async (req, res) => {
     try{
-        const book = await readBookByTitle(req.params.title);
-        if(book){
-            res.json(book);
+        const event = await readEventByTitle(req.params.title);
+        if(event){
+            res.json(event);
         }
         else{
-            res.status(404).json({error: "Book not found."});
+            res.status(404).json({error: "Event not found."});
         }
     }
     catch(error){
-        res.status(500).json({error: "Failed to fetch book."});
-    }
-})
-
-async function readBooksByAuthor(authorName){
-    try{
-        const books = await Book.find({author: authorName});
-        return books;
-    }
-    catch(error){
-        throw error
-    }
-}
-
-app.get("/books/author/:authorName", async (req, res) => {
-    try{
-        const books = await readBooksByAuthor(req.params.authorName);
-        if(books.length > 0){
-            res.json(books);
-        }
-        else{
-            res.status(404).json({error: "No books found."});
-        }
-    }
-    catch(error){
-        res.status(500).json({error: "Failed to fetch books."});
-    }
-})
-
-async function readBooksByGenre(bookGenre){
-    try{
-        const books = await Book.find({genre: bookGenre});
-        return books;
-    }
-    catch(error){
-        throw error
-    }
-}
-
-app.get("/books/genre/:bookGenre", async (req, res) => {
-    try{
-        const books = await readBooksByGenre(req.params.bookGenre);
-        if(books.length > 0){
-            res.json(books);
-        }
-        else{
-            res.status(404).json({error: "No books found."});
-        }
-    }
-    catch(error){
-        res.status(500).json({error: "Failed to fetch books."});
-    }
-})
-
-async function readBooksByReleaseYear(releaseYear){
-    try{
-        const books = await Book.find({publishedYear: releaseYear});
-        return books;
-    }
-    catch(error){
-        throw error
-    }
-}
-
-app.get("/books/year/:releaseYear", async (req, res) => {
-    try{
-        const books = await readBooksByReleaseYear(req.params.releaseYear);
-        if(books.length > 0){
-            res.json(books);
-        }
-        else{
-            res.status(404).json({error: "No books found."});
-        }
-    }
-    catch(error){
-        res.status(500).json({error: "Failed to fetch books."});
-    }
-})
-
-async function updateBook(bookId, dataToUpdate) {
-    try {
-        const updatedBook = await Book.findByIdAndUpdate(bookId, dataToUpdate, {
-            new: true
-        });
-        return updatedBook;
-    } catch (error) {
-        throw error;
-    }
-}
-
-app.post("/books/:bookId", async (req, res) => {
-    try {
-        const updatedBook = await updateBook(req.params.bookId, req.body);
-        if(updatedBook){            
-            res.status(200).json({message: "Book updated successfully.", updatedBook: updatedBook});
-        }
-        else{
-            res.status(404).json({message: "Book does not exist."});
-        }
-    } catch (error) {
-        res.status(500).json({error: "Failed to update the book."});
-    }
-})
-
-async function updateBookByTitle(bookTitle, dataToUpdate) {
-    try {
-        const updatedBook = await Book.findOneAndUpdate({title: bookTitle}, dataToUpdate, {
-            new: true
-        });
-        return updatedBook;
-    } catch (error) {
-        throw error;
-    }
-}
-
-app.post("/books/title/:bookTitle", async (req, res) => {
-    try {
-        const updatedBook = await updateBookByTitle(req.params.bookTitle, req.body);
-        if(updatedBook){            
-            res.status(200).json({message: "Book updated successfully.", updatedBook: updatedBook});
-        }
-        else{
-            res.status(404).json({message: "Book does not exist."});
-        }
-    } catch (error) {
-        res.status(500).json({error: "Failed to update the book."});
-    }
-})
-
-async function deleteBookById(bookId) {
-    try {
-        const deletedBook = Book.findByIdAndDelete(bookId);
-        return deletedBook;
-    } catch (error) {
-        throw error;
-    }
-}
-
-app.delete("/books/:bookId", async (req, res) => {
-    try {
-        const deletedBook = await deleteBookById(req.params.bookId);
-        if(deletedBook){
-            res.status(200).json({message: "Book deleted successfully.", deletedBook: deletedBook});
-        }
-        else{
-            res.status(404).json({error: "Book does not exist."});
-        }
-    } catch (error) {
-        res.status(500).json({error: "Failed to delete the book."});
+        res.status(500).json({error: "Failed to fetch event."});
     }
 })
 
