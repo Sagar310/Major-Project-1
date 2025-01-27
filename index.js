@@ -5,7 +5,13 @@ require("dotenv").config();
 const app = express();
 const { initializeDatabase } = require("./db/db.connect");
 const User = require("./models/user.models");
-const Event = require("./models/event.models");
+const Address = require("./models/address.models");
+const Cart = require("./models/cart.models");
+const Category = require("./models/category.models");
+const Order = require("./models/order.models");
+const OrderProduct = require("./models/orderProduct.models");
+const Product = require("./models/product.models");
+const Wishlist = require("./models/wishlist.models");
 
 const corsOptions = {
     origin: "*",
@@ -18,98 +24,196 @@ app.use(express.json());
 
 initializeDatabase();
 
-const newUser = {
-    name: "Michael Brown",
-    email: "michael.brown@gmail.com",
-    designation: "SEO Specialist",
-    profilePhotoUrl: "https://i.pravatar.cc/300"
-}
-
-const newEvent = {
-    title: "Marketing Seminar",
-    startTime: "Tue Aug 15 2023 at 10:00:00 AM",
-    endTime: "Tue Aug 15 2023 at 12:00:00 PM",
-    type: "Offline",
-    hostedBy: "Marketing Experts",
-    hostedAt: "Marketing City",    
-    price: 3000,
-    details: "Join us for an engaging Marketing Workshop on Tuesday, August 15, 2023, from 10:00 AM to 12:00 PM. This session is designed for individuals aged 18 and above who are eager to enhance their marketing skills and strategies. Whether you're a business owner, entrepreneur, or aspiring marketer, this workshop will provide valuable insights to boost your marketing efforts.Limited seats available! Reserve your spot today and take your marketing skills to the next level.",
-    speakers: ["67809b4714d8a177c3247b2a", "67809b7acd3a6e1b6bb45d3e"],
-    tags: ["marketing", "digital"],
-    dressCode: "Smart casual",
-    ageRestriction: "18 and above",
-    posterImageUrl: "https://img.freepik.com/free-photo/senior-woman-artist-teaching-group-people-how-draw-sitting-chair-classroom-smiling-camera-positive-atmosphere-drawing-workshop-art-education-sketching-classes-adults_482257-64491.jpg"
-}
-
-async function createEvent(newEvent) {
-    try{
-        const event = new Event(newEvent);
-        const saveEvent = await event.save();        
-    }
-    catch(error){
-        console.log(error);
-    }
-}
-//createEvent(newEvent);
-
-async function createUser(newUser) {
+async function createUser(newUser){
     try{
         const user = new User(newUser);
-        const saveUser = await user.save();        
-    }
-    catch(error){
-        console.log(error);
-    }
-}
-//createUser(newUser);
-
-async function readAllEvents() {
-    try{
-        const events = await Event.find()
-        return events;
+        const saveUser = await user.save();
+        return saveUser;
     }
     catch(error){
         throw error;
     }
 }
 
-app.get("/events", async (req, res) => {
-    try {
-        const events = await readAllEvents();
-        if(events.length > 0)
-        {
-            res.json(events);
-        }
-        else{
-            res.status(404).json({error: "No events found."});
-        }
-    } catch (error) {
-        res.status(500).json({error: "Failed to fetch events."});
+app.post("/user", async (req, res) => {
+    try{
+        const savedUser = await createUser(req.body)
+        res.status(201).json({message: "User added successfully.", user: savedUser})
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to add user."})
     }
 })
 
-async function readEventByTitle(eventTitle){
+async function createAddress(newAddress){
     try{
-        const event = await Event.findOne({title: eventTitle}).populate("speakers");
-        return event;
+        const address = new Address(newAddress);
+        const saveAddress = await address.save();
+        return saveAddress;
     }
     catch(error){
-        throw error
+        throw error;
     }
 }
 
-app.get("/events/:title", async (req, res) => {
+app.post("/address", async (req, res) => {
     try{
-        const event = await readEventByTitle(req.params.title);
-        if(event){
-            res.json(event);
-        }
-        else{
-            res.status(404).json({error: "Event not found."});
-        }
+        const savedAddress = await createAddress(req.body)
+        res.status(201).json({message: "Address added successfully.", address: savedAddress})
     }
     catch(error){
-        res.status(500).json({error: "Failed to fetch event."});
+        res.status(500).json({error: "Failed to add address."})
+    }
+})
+
+async function createCart(newCart){
+    try{
+        const cart = new Cart(newCart);
+        const saveCart = await cart.save();
+        return saveCart;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.post("/cart", async (req, res) => {
+    try{
+        const savedCart = await createCart(req.body)
+        res.status(201).json({message: "Cart added successfully.", cart: savedCart})
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to add cart."})
+    }
+})
+
+async function createCategory(newCategory){
+    try{
+        const category = new Category(newCategory);
+        const saveCategory = await category.save();
+        return saveCategory;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.post("/category", async (req, res) => {
+    try{
+        const savedCategory = await createCategory(req.body)
+        res.status(201).json({message: "Category added successfully.", category: savedCategory})
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to add category."})
+    }
+})
+
+async function createOrder(newOrder){
+    try{
+        const order = new Order(newOrder);
+        const saveOrder = await order.save();
+        return saveOrder;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.post("/order", async (req, res) => {
+    try{
+        const savedOrder = await createOrder(req.body)
+        res.status(201).json({message: "Order added successfully.", order: savedOrder})
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to add order."})
+    }
+})
+
+async function createOrderProduct(newOrderProduct){
+    try{
+        const orderProduct = new OrderProduct(newOrderProduct);
+        const saveOrderProduct = await orderProduct.save();
+        return saveOrderProduct;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.post("/order/product", async (req, res) => {
+    try{
+        const savedOrderProduct = await createOrderProduct(req.body)
+        res.status(201).json({message: "Order product added successfully.", orderProduct: savedOrderProduct})
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to add order product."})
+    }
+})
+
+async function createProduct(newProduct){
+    try{
+        const product = new Product(newProduct);
+        const saveProduct = await product.save();
+        return saveProduct;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.post("/product", async (req, res) => {
+    try{
+        const savedProduct = await createProduct(req.body)
+        res.status(201).json({message: "Product added successfully.", product: savedProduct})
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to add product."})
+    }
+})
+
+async function createWishlist(newWishlist){
+    try{
+        const wishlist = new Wishlist(newWishlist);
+        const saveWishlist = await wishlist.save();
+        return saveWishlist;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.post("/wishlist", async (req, res) => {
+    try{
+        const savedWishlist = await createWishlist(req.body)
+        res.status(201).json({message: "Wishlist added successfully.", wishlist: savedWishlist})
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to add wishlist."})
+    }
+})
+
+async function readAllProducts() {
+    try{
+        const products = await Product.find()
+        return products;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.get("/products", async (req, res) => {
+    try {
+        const products = await readAllProducts();
+        if(products.length > 0)
+        {
+            res.json(products);
+        }
+        else{
+            res.status(404).json({error: "No products found."});
+        }
+    } catch (error) {
+        res.status(500).json({error: "Failed to fetch products."});
     }
 })
 
