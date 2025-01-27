@@ -217,6 +217,56 @@ app.get("/products", async (req, res) => {
     }
 })
 
+async function readAllCategories() {
+    try{
+        const categories = await Category.find()
+        return categories;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.get("/categories", async (req, res) => {
+    try {
+        const categories = await readAllCategories();
+        if(categories.length > 0)
+        {
+            res.json(categories);
+        }
+        else{
+            res.status(404).json({error: "No categories found."});
+        }
+    } catch (error) {
+        res.status(500).json({error: "Failed to fetch categories."});
+    }
+})
+
+async function readAllFeaturedCategories() {
+    try{
+        const categories = await Category.find({isFeatured: true});
+        return categories;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.get("/categories/featured", async (req, res) => {
+    try {
+        const categories = await readAllFeaturedCategories();
+        if(categories.length > 0)
+        {
+            res.json(categories);
+        }
+        else{
+            res.status(404).json({error: "No featured categories found."});
+        }
+    } catch (error) {
+        res.status(500).json({error: "Failed to fetch featured categories."});
+    }
+})
+
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
