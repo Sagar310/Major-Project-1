@@ -194,7 +194,7 @@ app.post("/wishlist", async (req, res) => {
 
 async function readAllProducts() {
     try{
-        const products = await Product.find()
+        const products = await Product.find().populate("category");
         return products;
     }
     catch(error){
