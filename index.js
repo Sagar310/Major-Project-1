@@ -217,6 +217,31 @@ app.get("/products", async (req, res) => {
     }
 })
 
+async function readProductById(productId){
+    try{
+        const product = await Product.findOne({_id: productId}).populate("category");
+        return product;
+    }
+    catch(error){
+        throw error
+    }
+}
+
+app.get("/products/:productId", async (req, res) => {
+    try{
+        const product = await readProductById(req.params.productId);
+        if(product){
+            res.json(product);
+        }
+        else{
+            res.status(404).json({error: "Product not found."});
+        }
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to fetch product."});
+    }
+})
+
 async function readAllCategories() {
     try{
         const categories = await Category.find()
