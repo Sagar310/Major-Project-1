@@ -66,11 +66,11 @@ app.post("/address", async (req, res) => {
     }
 })
 
-async function createCart(newCart){
+async function addCartItem(cartItem){
     try{
         const cart = new Cart(newCart);
         const saveCart = await cart.save();
-        return saveCart;
+        return saveCart;        
     }
     catch(error){
         throw error;
@@ -79,11 +79,83 @@ async function createCart(newCart){
 
 app.post("/cart", async (req, res) => {
     try{
-        const savedCart = await createCart(req.body)
-        res.status(201).json({message: "Cart added successfully.", cart: savedCart})
+        const savedCart = await addCartItem(req.body)
+        res.status(201).json({message: "Item added to cart successfully.", cart: savedCart})
     }
     catch(error){
-        res.status(500).json({error: "Failed to add cart."})
+        res.status(500).json({error: "Failed to add item in the cart."})
+    }
+})
+
+async function updateCartItem(cartItemId, cartItem) {
+    try{
+        const updatedCartItem = await Cart.findByIdAndUpdate(cartItemId, cartItem, {
+            new: true
+        });
+        return updatedCartItem;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+app.post("/cart/:cartItemId", async (req, res) => {
+    try{
+        const updatedCartItem = await updateCartItem(req.params.cartItemId, req.body);
+        if(updatedCartItem){
+            res.status(200).json({message: "Cart item updated successfully.", updatedCartItem: updatedCartItem});
+        }
+        else{
+            res.status(404).json({message: "Cart item not found."});
+        }
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to update cart item."});
+    }
+})
+
+async function readCartItemsByUser(userId){
+    try{
+        const cartItems = await Cart.find({user: userId});
+        return cartItems;
+    }
+    catch(error){
+        throw error
+    }
+}
+
+app.get("/cart/user/:userId", async (req, res) => {
+    try{
+        const cartItems = await readCartItemsByUser(req.params.userId);
+        if(cartItems.length > 0){
+            res.json(cartItems);
+        }
+        else{
+            res.status(404).json({error: "No cart items found."});
+        }
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to fetch cart items."});
+    }
+})
+
+async function deleteItemFromCart(cartItemId){
+    try{        
+        const deletedItem = await Cart.findByIdAndDelete(cartItemId);        
+        return deletedItem;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+app.delete("/cart/delete/:cartItemId", async (req,res) => {
+    try{        
+        const deletedItem = await deleteItemFromCart(req.params.cartItemId);        
+        res.status(200).json({message: "Cart item deleted successfully."});
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to delete the item from the cart."});
     }
 })
 
