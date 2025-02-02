@@ -267,7 +267,9 @@ app.post("/wishlist", async (req, res) => {
 async function readAllProducts() {
     try{
         const products = await Product.find().populate("category");
-        return products;
+        const wishlist = await Wishlist.find().populate("product");                
+        productsWithWishlist = products.map((productItem) => {return {...productItem.toObject(), isWishlisted: (wishlist.some((obj) => obj.product._id.toString() === productItem._id.toString()))}});
+        return productsWithWishlist;
     }
     catch(error){
         throw error;
