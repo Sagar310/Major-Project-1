@@ -5,6 +5,14 @@ const addressSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
+    name: {
+        type: String,
+        required: true
+    },
+    mobile: {
+        type: String,
+        required: true
+    },
     addressLine1: {
         type: String,
         required: true
@@ -32,11 +40,7 @@ const addressSchema = new mongoose.Schema({
     isDefault: {
         type: Boolean,        
         default: false
-    },
-    product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product"
-    } 
+    }
 },
 {
     timestamps: true
