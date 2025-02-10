@@ -66,6 +66,31 @@ app.post("/address", async (req, res) => {
     }
 })
 
+async function readAllAddresses() {
+    try{
+        const addresses = await Address.find();        
+        return addresses;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.get("/addresses", async (req, res) => {
+    try {
+        const addresses = await readAllAddresses();
+        if(addresses.length > 0)
+        {
+            res.json(addresses);
+        }
+        else{
+            res.status(404).json({error: "No addresses found."});
+        }
+    } catch (error) {
+        res.status(500).json({error: "Failed to fetch addresses."});
+    }
+})
+
 async function addCartItem(cartItem){
     try{
         const cart = new Cart(newCart);
