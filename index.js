@@ -111,6 +111,33 @@ app.delete("/address/:addressId", async (req,res) => {
     }
 })
 
+async function updateAddress(addressId, dataToUpdate) {
+    try{
+        const updatedAddress = await Address.findByIdAndUpdate(addressId, dataToUpdate, {
+            new: true
+        });
+        return updatedAddress;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+app.post("/address/:addressId", async (req, res) => {
+    try{
+        const updatedAddress = await updateAddress(req.params.addressId, req.body);
+        if(updatedAddress){
+            res.status(200).json({message: "Address updated successfully."});
+        }
+        else{
+            res.status(404).json({message: "Address not found."});
+        }
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to update the address."});
+    }
+})
+
 async function addCartItem(cartItem){
     try{
         const cart = new Cart(newCart);
