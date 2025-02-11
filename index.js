@@ -104,7 +104,7 @@ async function deleteAddress(addressId){
 app.delete("/address/:addressId", async (req,res) => {
     try{        
         const deletedAddress = await deleteAddress(req.params.movieId);        
-        res.status(200).json({message: "Address deleted successfully."});
+        res.status(200).json({message: "Address deleted successfully." + deletedAddress});
     }
     catch(error){
         res.status(500).json({error: "Failed to delete movie."});
