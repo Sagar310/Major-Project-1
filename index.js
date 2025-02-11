@@ -91,6 +91,26 @@ app.get("/addresses", async (req, res) => {
     }
 })
 
+async function deleteAddress(addressId){
+    try{        
+        const deletedAddress = await Address.findByIdAndDelete(addressId);        
+        return deletedAddress;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+app.delete("/address/:addressId", async (req,res) => {
+    try{        
+        const deletedAddress = await deleteAddress(req.params.movieId);        
+        res.status(200).json({message: "Address deleted successfully."});
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to delete movie."});
+    }
+})
+
 async function addCartItem(cartItem){
     try{
         const cart = new Cart(newCart);
