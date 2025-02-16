@@ -357,6 +357,31 @@ app.delete("/wishlist", async (req, res) => {
     }
 })
 
+async function readAllWishlistedProducts() {
+    try{        
+        const wishlistedProducts = await Wishlist.find().populate("product");                        
+        return wishlistedProducts;
+    }
+    catch(error){
+        throw error;
+    }
+}
+
+app.get("/wishlist", async (req, res) => {
+    try {
+        const wishlistedProducts = await readAllWishlistedProducts();
+        if(wishlistedProducts.length > 0)
+        {
+            res.json(wishlistedProducts);
+        }
+        else{
+            res.status(404).json({error: "No wishlisted products found."});
+        }
+    } catch (error) {
+        res.status(500).json({error: "Failed to fetch the wishlisted products."});
+    }
+})
+
 async function readAllProducts() {
     try{
         const products = await Product.find().populate("category");
