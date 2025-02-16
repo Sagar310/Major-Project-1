@@ -336,9 +336,9 @@ app.post("/wishlist", async (req, res) => {
     }
 })
 
-async function deleteItemFromWishlist(wishlistId){
+async function deleteItemFromWishlist(product, user){
     try{        
-        const deletedWishlistItem = await Wishlist.findByIdAndDelete(wishlistId);        
+        const deletedWishlistItem = await Wishlist.deleteOne({ product, user });
         return deletedWishlistItem;
     }
     catch(error){
@@ -346,9 +346,10 @@ async function deleteItemFromWishlist(wishlistId){
     }
 }
 
-app.delete("/wishlist/:wishlistId", async (req,res) => {
+app.delete("/wishlist", async (req, res) => {
+    const { product, user } = req.body;
     try{        
-        const deletedWishlistItem = await deleteItemFromWishlist(req.params.wishlistId);        
+        const deletedWishlistItem = await deleteItemFromWishlist(product, user);        
         res.status(200).json({message: "Item deleted from the wishlist successfully."});
     }
     catch(error){
