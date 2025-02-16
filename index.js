@@ -315,11 +315,11 @@ app.post("/product", async (req, res) => {
     }
 })
 
-async function createWishlist(newWishlist){
+async function addItemToWishlist(item){
     try{
-        const wishlist = new Wishlist(newWishlist);
-        const saveWishlist = await wishlist.save();
-        return saveWishlist;
+        const saveWishlistItem = new Wishlist(item);
+        const savedWishlistItem = await saveWishlistItem.save();
+        return savedWishlistItem;
     }
     catch(error){
         throw error;
@@ -328,11 +328,31 @@ async function createWishlist(newWishlist){
 
 app.post("/wishlist", async (req, res) => {
     try{
-        const savedWishlist = await createWishlist(req.body)
-        res.status(201).json({message: "Wishlist added successfully.", wishlist: savedWishlist})
+        const savedWishlistItem = await addItemToWishlist(req.body)
+        res.status(201).json({message: "Item added to the wishlist successfully.", item: savedWishlistItem})
     }
     catch(error){
-        res.status(500).json({error: "Failed to add wishlist."})
+        res.status(500).json({error: "Failed to add item to the wishlist."})
+    }
+})
+
+async function deleteItemFromWishlist(wishlistId){
+    try{        
+        const deletedWishlistItem = await Wishlist.findByIdAndDelete(wishlistId);        
+        return deletedWishlistItem;
+    }
+    catch(error){
+        console.log(error);
+    }
+}
+
+app.delete("/wishlist/:wishlistId", async (req,res) => {
+    try{        
+        const deletedWishlistItem = await deleteItemFromWishlist(req.params.wishlistId);        
+        res.status(200).json({message: "Item deleted from the wishlist successfully."});
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to delete the item from the wishlist."});
     }
 })
 
