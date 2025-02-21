@@ -174,7 +174,7 @@ app.post("/cart", async (req, res) => {
         }      
     }
     catch(error){
-        res.status(500).json({error: "Failed to add item in the cart."})
+        res.status(500).json({error: "Failed to add item in the cart.", item: req.body})
     }
 })
 
