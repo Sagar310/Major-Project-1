@@ -207,7 +207,7 @@ app.post("/cart/:cartItemId", async (req, res) => {
 
 async function readCartItemsByUser(userId){
     try{
-        const cartItems = await Cart.find({user: userId});
+        const cartItems = await Cart.find({user: userId}).populate("product");                        ;
         return cartItems;
     }
     catch(error){
