@@ -138,13 +138,13 @@ app.post("/address/:addressId", async (req, res) => {
     }
 })
 
-async function addCartItem(cartItem){
+async function addCartItem(cartItem){    
     try{
-        const cart = new Cart(newCart);
+        const cart = new Cart(cartItem);
         const saveCart = await cart.save();
         return saveCart;        
     }
-    catch(error){
+    catch(error){        
         throw error;
     }
 }
@@ -174,7 +174,7 @@ app.post("/cart", async (req, res) => {
         }      
     }
     catch(error){
-        res.status(500).json({error: "Failed to add item in the cart.", item: req.body})
+        res.status(500).json({error: "Failed to add item in the cart."})
     }
 })
 
