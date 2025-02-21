@@ -156,7 +156,7 @@ app.post("/cart", async (req, res) => {
 
         if (existingItem) 
         {        
-            existingItem.quantity += quantity;            
+            existingItem.quantity = existingItem.quantity + quantity > 10 ? 10 : existingItem.quantity + quantity;            
             const updatedCartItem = await updateCartItem(existingItem._id, existingItem);
             if(updatedCartItem)
             {
