@@ -150,9 +150,28 @@ async function addCartItem(cartItem){
 }
 
 app.post("/cart", async (req, res) => {
+    const { productId, userId, size, quantity } = req.body;
     try{
-        const savedCart = await addCartItem(req.body)
-        res.status(201).json({message: "Item added to cart successfully.", cart: savedCart})
+        const existingItem = await Cart.findOne({ productId, userId, size });
+
+        if (existingItem) 
+        {
+            existingItem.quantity += quantity;            
+            const updatedCartItem = await updateCartItem(existingItem._id, existingItem);
+            if(updatedCartItem)
+            {
+                res.status(200).json({message: "Cart item updated successfully.", updatedCartItem: updatedCartItem});
+            }
+            else
+            {
+                res.status(404).json({message: "Cart item not found."});
+            }
+        } 
+        else 
+        {
+            const savedCart = await addCartItem(req.body)
+            res.status(201).json({message: "Item added to cart successfully.", cart: savedCart})
+        }      
     }
     catch(error){
         res.status(500).json({error: "Failed to add item in the cart."})
