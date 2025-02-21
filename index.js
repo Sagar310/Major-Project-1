@@ -150,12 +150,12 @@ async function addCartItem(cartItem){
 }
 
 app.post("/cart", async (req, res) => {
-    const { productId, userId, size, quantity } = req.body;
-    try{
-        const existingItem = await Cart.findOne({ productId, userId, size });
+    const { product, user, size, quantity } = req.body;
+    try{        
+        const existingItem = await Cart.findOne({ product, user, size });
 
         if (existingItem) 
-        {
+        {        
             existingItem.quantity += quantity;            
             const updatedCartItem = await updateCartItem(existingItem._id, existingItem);
             if(updatedCartItem)
