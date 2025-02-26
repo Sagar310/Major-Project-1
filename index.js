@@ -242,8 +242,13 @@ async function deleteItemFromCart(cartItemId){
 
 app.delete("/cart/:cartItemId", async (req,res) => {
     try{        
-        const deletedItem = await deleteItemFromCart(req.params.cartItemId);        
-        res.status(200).json({message: "Cart item deleted successfully."});
+        const deletedItem = await deleteItemFromCart(req.params.cartItemId);   
+        if(deletedItem){
+            res.status(200).json({message: "Cart item deleted successfully."});
+        }
+        else{
+            res.status(404).json({message: "Cart item not found."});
+        }             
     }
     catch(error){
         res.status(500).json({error: "Failed to delete the item from the cart."});
