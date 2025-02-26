@@ -240,7 +240,7 @@ async function deleteItemFromCart(cartItemId){
     }
 }
 
-app.delete("/cart/delete/:cartItemId", async (req,res) => {
+app.delete("/cart/:cartItemId", async (req,res) => {
     try{        
         const deletedItem = await deleteItemFromCart(req.params.cartItemId);        
         res.status(200).json({message: "Cart item deleted successfully."});
