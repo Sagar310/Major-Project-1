@@ -5,13 +5,29 @@ const orderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     },
-    totalPrice: {
+    orderPrice: {
         type: Number,
+        required: true
+    },
+    quantity: {
+        type: Number,
+        required: true
+    },
+    size: {
+        type: String,
         required: true
     },
     status: {
         type: String,        
         enum: ["Pending", "Shipped", "Delivered"]
+    },
+    expectedDeliveryDate: { 
+        type: Date, 
+        default: Date.now        
+    },
+    actualDeliveryDate: { 
+        type: Date, 
+        default: Date.now 
     },
     product: {
         type: mongoose.Schema.Types.ObjectId,
