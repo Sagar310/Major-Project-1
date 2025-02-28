@@ -297,6 +297,31 @@ app.post("/order", async (req, res) => {
     }
 })
 
+async function getOrdersByUserId(userId){
+    try{
+        const orders = await Order.find({user: userId}).populate("product");                        ;
+        return orders;
+    }
+    catch(error){
+        throw error
+    }
+}
+
+app.get("/orders/:userId", async (req, res) => {
+    try{
+        const orders = await getOrdersByUserId(req.params.userId);
+        if(orders.length > 0){
+            res.json(orders);
+        }
+        else{
+            res.status(404).json({error: "No orders found."});
+        }
+    }
+    catch(error){
+        res.status(500).json({error: "Failed to fetch orders."});
+    }
+})
+
 async function createOrderProduct(newOrderProduct){
     try{
         const orderProduct = new OrderProduct(newOrderProduct);
